@@ -11,7 +11,7 @@ const addUser = async (req, res) => {
   const { name, email, phone, address, DOB, password } = req.body;
   if (!name || !email || !phone || !address || !DOB) {
     return res.status(400).json({
-      error: "Please provide all the fields",
+      error: "Please pr ovide all the fields",
     });
   }
   const existingEmail = await User.findOne({ where: { email: email } });
@@ -46,6 +46,27 @@ const addUser = async (req, res) => {
   });
   res.status(200).json(user);
 };
+
+const getAllUsers = async(req,res)=>{
+  const users = await User.findAll({});
+  console.log(users);
+  res.status(200).send(users);
+}
+
+const getUser = async(req,res)=>{
+const findUserById = await User.findByPk(req.params.id);
+res.status(200).json({
+  name:findUserById.name,
+  email:findUserById.email,
+  phone:findUserById.phone,
+  address:findUserById.address,
+  DOB:findUserById.DOB
+})
+}
+
+
 module.exports = {
-  addUser
+  addUser,
+  getAllUsers,
+  getUser
 };
