@@ -3,10 +3,10 @@ const User = db.User;
 const bcrypt = require("bcrypt");
 
 const isValidDate = (date) => {
-    const dateFormat = /^\d{4}-\d{2}-\d{2}$/;
-    return dateFormat.test(date);
-  };
-  
+  const dateFormat = /^\d{4}-\d{2}-\d{2}$/;
+  return dateFormat.test(date);
+};
+
 const addUser = async (req, res) => {
   const { name, email, phone, address, DOB, password } = req.body;
   if (!name || !email || !phone || !address || !DOB) {
@@ -42,31 +42,57 @@ const addUser = async (req, res) => {
     password: hashedPassword,
     phone,
     address,
-    DOB
+    DOB,
   });
   res.status(200).json(user);
 };
 
-const getAllUsers = async(req,res)=>{
+const getAllUsers = async (req, res) => {
   const users = await User.findAll({});
   console.log(users);
   res.status(200).send(users);
-}
+};
 
-const getUser = async(req,res)=>{
-const findUserById = await User.findByPk(req.params.id);
-res.status(200).json({
-  name:findUserById.name,
-  email:findUserById.email,
-  phone:findUserById.phone,
-  address:findUserById.address,
-  DOB:findUserById.DOB
-})
-}
+const getUser = async (req, res) => {
+  const findUserById = await User.findByPk(req.params.id);
+  res.status(200).json({
+    name: findUserById.name,
+    email: findUserById.email,
+    phone: findUserById.phone,
+    address: findUserById.address,
+    DOB: findUserById.DOB,
+  });
+};
 
+const updateUser = async (req, res) => {
+  const user = await User.findByPk(req.params.id);
+  if (req.body.name) {
+    user.name = req.body.name;
+  }
+  if (req.body.email) {
+    user.email = req.body.email;
+  }
+  if (req.body.password) {
+    const hashedPassword = await bcrypt.hashSync(req.body.password);
+    user.password = hashedPassword;
+  }
+  if (req.body.DOB) {
+    user.DOB = req.body.DOB;
+  }
 
+  await user.save();
+
+  res.status(200).json(user);
+};
+
+const deleteUser = async (req, res) => {
+  await User.destroy({ where: { id: req.params.id } });
+  res.status(200).send(`User with id ${req.params.id} deleted`);
+};
 module.exports = {
   addUser,
   getAllUsers,
-  getUser
+  getUser,
+  updateUser,
+  deleteUser,
 };
